@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    userName: {
+    username: {
       type: String,
       required: true,
-      unique: true, // Create index for userName, return results faster
+      unique: true, // Create index for username, return results faster
       trim: true,
       lowercase: true,
     },

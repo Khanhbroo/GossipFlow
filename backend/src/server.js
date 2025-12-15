@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
+import authRoute from "./routes/authRoute.js";
 
 dotenv.config();
 
@@ -9,6 +10,11 @@ const PORT = process.env.PORT || 5001;
 
 // Middlewares
 app.use(express.json());
+
+// Public Routes
+app.use("/api/auth", authRoute);
+
+// Private Routes
 
 // Connect DB
 await connectDB();
