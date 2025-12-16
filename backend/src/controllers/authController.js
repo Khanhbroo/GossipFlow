@@ -104,7 +104,27 @@ export const signIn = async (req, res) => {
       accessToken,
     });
   } catch (error) {
-    console.log("Erorr when signing in:", error);
+    console.log("Error when signing in:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const signOut = async (req, res) => {
+  try {
+    // Take refresh token from cookie
+    const token = req.cookies?.refreshToken; // With cookie-parser middleware
+
+    if (token) {
+      // Delete refresh token from Session
+      await Session.deleteOne({ refreshToken: token });
+
+      // Delete cookie
+      res.clearCookie("refreshToken");
+    }
+
+    return res.sendStatus(204);
+  } catch (error) {
+    console.log("Error when sigin out:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
