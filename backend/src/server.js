@@ -1,8 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+
 import { connectDB } from "./config/db.js";
 import authRoute from "./routes/authRoute.js";
-import cookieParser from "cookie-parser";
+import userRoute from "./routes/userRoute.js";
+import { protectedRoute } from "./middlewares/authMiddleware.js";
 
 dotenv.config();
 
@@ -17,6 +20,8 @@ app.use(cookieParser());
 app.use("/api/auth", authRoute);
 
 // Private Routes
+app.use(protectedRoute);
+app.use("/api/user", userRoute);
 
 // Connect DB
 await connectDB();
