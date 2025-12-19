@@ -20,20 +20,21 @@ const signUpSchema = z.object({
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
-export function SignupForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmit },
+    formState: { errors, isSubmitting },
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
   });
 
   const onSubmit = async (data: SignUpFormValues) => {
     // Register back end to sign up
+    console.log(data);
   };
 
   return (
@@ -62,16 +63,28 @@ export function SignupForm({
                   <Label htmlFor="firstname" className="block text-sm">
                     First Name
                   </Label>
-                  <Input type="text" id="firstname" />
-                  {/* Todo: error message */}
+                  <Input
+                    type="text"
+                    id="firstname"
+                    {...register("firstname")}
+                  />
+                  {errors.firstname && (
+                    <p className="text-destructive text-sm">
+                      {errors.firstname?.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="lastname" className="block text-sm">
                     Last Name
                   </Label>
-                  <Input type="text" id="lastname" />
-                  {/* Todo: error message */}
+                  <Input type="text" id="lastname" {...register("lastname")} />
+                  {errors.lastname && (
+                    <p className="text-destructive text-sm">
+                      {errors.lastname?.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -80,8 +93,17 @@ export function SignupForm({
                 <Label htmlFor="username" className="block text-sm">
                   Username
                 </Label>
-                <Input type="text" id="username" />
-                {/* Todo: error message */}
+                <Input
+                  type="text"
+                  id="username"
+                  autoComplete="username"
+                  {...register("username")}
+                />
+                {errors.username && (
+                  <p className="text-destructive text-sm">
+                    {errors.username?.message}
+                  </p>
+                )}
               </div>
 
               {/* Email */}
@@ -92,9 +114,15 @@ export function SignupForm({
                 <Input
                   type="email"
                   id="email"
+                  autoComplete="email"
                   placeholder="example@gmail.com"
+                  {...register("email")}
                 />
-                {/* Todo: error message */}
+                {errors.email && (
+                  <p className="text-destructive text-sm">
+                    {errors.email?.message}
+                  </p>
+                )}
               </div>
 
               {/* Password */}
@@ -102,12 +130,25 @@ export function SignupForm({
                 <Label htmlFor="password" className="block text-sm">
                   Password
                 </Label>
-                <Input type="password" id="password" />
-                {/* Todo: error message */}
+                <Input
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  {...register("password")}
+                />
+                {errors.password && (
+                  <p className="text-destructive text-sm">
+                    {errors.password?.message}
+                  </p>
+                )}
               </div>
 
               {/* Register Button */}
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full hover:cursor-pointer"
+                disabled={isSubmitting}
+              >
                 Create account
               </Button>
 
@@ -123,7 +164,7 @@ export function SignupForm({
             <img
               src="/signUpPlaceholder.png"
               alt="Image"
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute top-1/2 -translate-y-1/2 object-cover"
             />
           </div>
         </CardContent>
