@@ -2,8 +2,9 @@ import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -21,14 +22,20 @@ export const SignInForm = ({
   className,
   ...props
 }: React.ComponentProps<"div">) => {
+  const { signIn } = useAuthStore();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignInFormValues>({ resolver: zodResolver(signInSchema) });
 
-  const onSubmit = (data: SignInFormValues) => {
+  const onSubmit = async (data: SignInFormValues) => {
+    const { username, password } = data;
+
     // Register backend to signin
+    await signIn(username, password);
+    navigate("/");
   };
 
   return (

@@ -25,4 +25,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ loading: false });
     }
   },
+
+  signIn: async (username, password) => {
+    try {
+      set({ loading: true });
+
+      //   Call API
+      const { accessToken } = await authService.signIn(username, password);
+      set({ accessToken });
+
+      toast.success("Welcome back to GossipFlow 🎉");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to sign in");
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
