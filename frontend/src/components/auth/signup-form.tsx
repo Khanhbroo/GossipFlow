@@ -2,8 +2,9 @@ import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -24,6 +25,8 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { signUp } = useAuthStore();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -33,8 +36,11 @@ export function SignUpForm({
   });
 
   const onSubmit = async (data: SignUpFormValues) => {
+    const { firstname, lastname, username, email, password } = data;
+
     // Register back end to sign up
-    console.log(data);
+    await signUp(username, password, email, firstname, lastname);
+    navigate("/signin");
   };
 
   return (
@@ -164,7 +170,7 @@ export function SignUpForm({
             <img
               src="/signUpPlaceholder.png"
               alt="Image"
-              className="absolute top-1/2 -translate-y-1/2 object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
         </CardContent>

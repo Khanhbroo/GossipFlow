@@ -108,7 +108,7 @@ export const SignInForm = ({
             <img
               src="/signInPlaceholder.png"
               alt="Image"
-              className="absolute top-1/2 -translate-y-1/2 object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
         </CardContent>
