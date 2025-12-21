@@ -8,6 +8,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: false,
 
+  setAccessToken: (accessToken) => {
+    set({ accessToken });
+  },
+
   clearState: () => {
     set({ accessToken: null, user: null, loading: false });
   },
@@ -36,7 +40,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       //   Call API
       const { accessToken } = await authService.signIn(username, password);
-      set({ accessToken });
+      get().setAccessToken(accessToken);
 
       // Set user data to the store
       await get().fetchMe();
@@ -78,10 +82,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   refresh: async () => {
     try {
       set({ loading: true });
-      const { user, fetchMe } = get();
+      const { user, fetchMe, setAccessToken } = get();
 
       const accessToken = await authService.refresh();
-      set({ accessToken });
+      setAccessToken(accessToken);
 
       if (!user) {
         await fetchMe();
