@@ -16,6 +16,6 @@ export interface AuthState {
   ) => Promise<void>;
 
   signIn: (username: string, password: string) => Promise<void>;
-
   signOut: () => Promise<void>;
+  fetchMe: () => Promise<void>;
 }

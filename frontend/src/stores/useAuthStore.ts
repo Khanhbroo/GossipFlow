@@ -38,6 +38,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { accessToken } = await authService.signIn(username, password);
       set({ accessToken });
 
+      // Set user data to the store
+      await get().fetchMe();
+
       toast.success("Welcome back to GossipFlow 🎉");
     } catch (error) {
       console.error(error);
@@ -55,6 +58,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error(error);
       toast.error("Failed to sign out");
+    }
+  },
+
+  fetchMe: async () => {
+    try {
+      set({ loading: true });
+      const user = await authService.fetchMe();
+      set({ user });
+    } catch (error) {
+      console.error(error);
+      set({ user: null, accessToken: null });
+      toast.error("Failed to fetch user data. Please try again!");
+    } finally {
+      set({ loading: false });
     }
   },
 }));

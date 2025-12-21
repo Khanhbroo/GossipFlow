@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import ChatAppPage from "./pages/ChatAppPage";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Toaster } from "sonner";
 
 function App() {
@@ -15,7 +16,9 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
 
           {/* Protected Route */}
-          <Route path="/" element={<ChatAppPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<ChatAppPage />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </>
