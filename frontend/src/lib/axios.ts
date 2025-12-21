@@ -35,7 +35,10 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 403) {
+    originalRequest._retryCount = originalRequest._retryCount || 0;
+
+    if (error.response?.status === 403 && originalRequest._retryCount < 4) {
+      originalRequest._retryCount += 1;
       try {
         const res = await api.post(
           "/auth/refresh",
