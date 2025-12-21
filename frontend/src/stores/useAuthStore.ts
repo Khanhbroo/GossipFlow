@@ -8,6 +8,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: false,
 
+  clearState: () => {
+    set({ accessToken: null, user: null, loading: false });
+  },
+
   signUp: async (username, password, email, firstName, lastName) => {
     try {
       set({ loading: true });
@@ -19,7 +23,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         "Signed up successfully! You will be redirected to sign in page"
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Failed to sign up");
     } finally {
       set({ loading: false });
@@ -36,10 +40,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       toast.success("Welcome back to GossipFlow 🎉");
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Failed to sign in");
     } finally {
       set({ loading: false });
+    }
+  },
+
+  signOut: async () => {
+    try {
+      get().clearState();
+      await authService.signOut();
+      toast.success("Logout successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to sign out");
     }
   },
 }));
