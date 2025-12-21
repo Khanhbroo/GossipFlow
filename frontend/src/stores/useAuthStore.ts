@@ -74,4 +74,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ loading: false });
     }
   },
+
+  refresh: async () => {
+    try {
+      set({ loading: true });
+      const { user, fetchMe } = get();
+
+      const accessToken = await authService.refresh();
+      set({ accessToken });
+
+      if (!user) {
+        await fetchMe();
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Your login session has expired. Please login again!");
+      get().clearState();
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
