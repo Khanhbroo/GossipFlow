@@ -4,9 +4,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import { connectDB } from "./config/db.js";
+import { protectedRoute } from "./middlewares/authMiddleware.js";
 import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";
-import { protectedRoute } from "./middlewares/authMiddleware.js";
+import friendRoute from "./routes/friendRoute.js";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use("/api/auth", authRoute);
 // Private Routes
 app.use(protectedRoute);
 app.use("/api/user", userRoute);
+app.use("/api/friend", friendRoute);
 
 // Connect DB
 await connectDB();
