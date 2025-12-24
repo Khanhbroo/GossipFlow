@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Friend from "../models/Friend.js";
 import FriendRequest from "../models/FriendRequest.js";
 import User from "../models/User.js";
@@ -11,7 +12,7 @@ export const sendFriendRequest = async (req, res) => {
       return res.status(404).json({ message: "User not existed" });
     }
 
-    if (from === to) {
+    if (from.toString() === to.toString()) {
       return res
         .status(400)
         .json({ message: "Can not send friend request to your self" });
@@ -31,7 +32,10 @@ export const sendFriendRequest = async (req, res) => {
     }
 
     const [alreadyFriends, existingRequest] = await Promise.all([
-      Friend.findOne({ userA, userB }),
+      Friend.findOne({
+        userA: new mongoose.Types.ObjectId(userA),
+        userB: new mongoose.Types.ObjectId(userB),
+      }),
       FriendRequest.findOne({
         $or: [
           { from, to },
@@ -72,7 +76,7 @@ export const acceptFriendRequest = async (req, res) => {
       return res.status(404).json({ messsage: "No friend request found" });
     }
 
-    if (request.to.toString() !== userId) {
+    if (request.to.toString() !== userId.toString()) {
       return res.status(403).json({
         message: "You do not have authorization to accept this invitation",
       });

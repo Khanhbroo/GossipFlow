@@ -16,16 +16,16 @@ const friendSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-friendSchema.pre("save", function (next) {
+friendSchema.pre("save", async function () {
   const a = this.userA.toString();
   const b = this.userB.toString();
 
   if (a > b) {
-    this.userA = new mongoose.Schema.Types.ObjectId(b);
-    this.userB = new mongoose.Schema.Types.ObjectId(a);
+    this.userA = new mongoose.Types.ObjectId(b);
+    this.userB = new mongoose.Types.ObjectId(a);
   }
 
-  next();
+  return;
 });
 
 friendSchema.index({ userA: 1, userB: 1 }, { unique: true }); // Make sure to create a unique index for A and B, this won't be duplicated
