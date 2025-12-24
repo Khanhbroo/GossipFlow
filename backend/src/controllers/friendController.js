@@ -63,6 +63,42 @@ export const sendFriendRequest = async (req, res) => {
 
 export const acceptFriendRequest = async (req, res) => {
   try {
+    const { requestId } = req.params;
+    const userId = req.user._id;
+
+    const request = await FriendRequest.findById(requestId);
+
+    if (!request) {
+      return res.status(404).json({ messsage: "No friend request found" });
+    }
+
+    if (request.to.toString() !== userId) {
+      return res.status(403).json({
+        message: "You do not have authorization to accept this invitation",
+      });
+    }
+
+    const friend = await Friend.create({
+      userA: request.from,
+      userB: request.to,
+    });
+
+    await FriendRequest.findByIdAndDelete(requestId);
+
+    const from = await User.findById(request.from)
+      .select("_id displayName avatarUrl")
+      .lean();
+
+    return res
+      .status(200)
+      .json({
+        message: "Accepting friend request successfully!",
+        newFriend: {
+          _id: from?._id,
+          displayName: from?.displayName,
+          avatarUrl: from?.avatarUrl,
+        },
+      });
   } catch (error) {
     console.log("Error when accepting friend request", error);
     return res.status(500).json({ message: "Internal Server Error" });
