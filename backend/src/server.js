@@ -25,7 +25,7 @@ app.use("/api/auth", authRoute);
 // Private Routes
 app.use(protectedRoute);
 app.use("/api/user", userRoute);
-app.use("/api/friend", friendRoute);
+app.use("/api/friends", friendRoute);
 
 // Connect DB
 await connectDB();

@@ -107,36 +107,87 @@ export const acceptFriendRequest = async (req, res) => {
   }
 };
 
+// export const declineFriendRequest = async (req, res) => {
+//   try {
+//     const { requestId } = req.params;
+//     const userId = req.user._id;
+
+//     const request = await FriendRequest.findById(requestId);
+
+//     if (!request) {
+//       return res.status(404).json({ message: "No friend request found" });
+//     }
+
+//     if (request.to.toString() !== userId) {
+//       return res.status(403).json({
+//         message: "You do not have authorization to decline this friend request",
+//       });
+//     }
+
+//     await FriendRequest.findByIdAndDelete(requestId);
+
+//     return res
+//       .status(201)
+//       .json({ message: "Decline friend request successfully!" });
+//   } catch (error) {
+//     console.log("Error when declining friend request", error);
+//     return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
 export const declineFriendRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
     const userId = req.user._id;
 
-    const request = await FriendRequest.findById(requestId);
+    const friendRequest = await FriendRequest.findById(requestId);
 
-    if (!request) {
-      return res.status(404).json({ message: "No friend request found" });
+    if (!friendRequest) {
+      return res.status(404).json({ message: "Friend request not found!" });
     }
 
-    if (request.to.toString() !== userId) {
-      return res.status(403).json({
-        message: "You do not have authorization to decline this friend request",
-      });
+    if (friendRequest.to.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "You can not do this!" });
     }
 
     await FriendRequest.findByIdAndDelete(requestId);
 
-    return res
-      .status(201)
-      .json({ message: "Decline friend request successfully!" });
+    return res.status(200).json({ message: "Decline friend successfully!" });
   } catch (error) {
-    console.log("Error when declining friend request", error);
+    console.log("Error declining friend", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const getAllFriends = async (req, res) => {
   try {
+    const userId = req.user._id;
+
+    const friendships = await Friend.find({
+      $or: [
+        {
+          userA: userId,
+        },
+        {
+          userB: userId,
+        },
+      ],
+    })
+      .populate("userA", "_id displayName avatarUrl")
+      .populate("userB", "_id displayName avatarUrl")
+      .lean();
+
+    if (!friendships.length) {
+      return res.status(200).json({ friends: [] });
+    }
+
+    const friends = friendships.map((friend) => {
+      return friend.userA._id.toString() === userId.toString()
+        ? friend.userB
+        : friend.userA;
+    });
+
+    return res.status(200).json({ friends });
   } catch (error) {
     console.log("Error when getting friend list", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -145,6 +196,16 @@ export const getAllFriends = async (req, res) => {
 
 export const getAllRequests = async (req, res) => {
   try {
+    const userId = req.user._id;
+
+    const populateFields = "_id username displayName avatarUrl";
+
+    const [sent, received] = await Promise.all([
+      FriendRequest.find({ from: userId }).populate("to", populateFields),
+      FriendRequest.find({ to: userId }).populate("from", populateFields),
+    ]);
+
+    res.status(200).json({sent, received});
   } catch (error) {
     console.log("Error when getting all requests", error);
     return res.status(500).json({ message: "Internal Server Error" });

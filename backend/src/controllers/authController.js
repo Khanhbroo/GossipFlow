@@ -77,18 +77,21 @@ export const signIn = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: ACCESS_TOKEN_TTL }
+      { expiresIn: ACCESS_TOKEN_TTL },
     );
 
     // Then, create a refresh token
     const refreshToken = crypto.randomBytes(64).toString("hex");
 
     // Create a new session to save the refresh token
-    await Session.create({
-      userId: user._id,
-      refreshToken,
-      expiredAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
-    });
+    await Session.findOneAndUpdate(
+      { userId: user._id },
+      {
+        refreshToken,
+        expiredAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
+      },
+      { upsert: true },
+    );
 
     // Return refresh token to client through cookies
     res.cookie("refreshToken", refreshToken, {
@@ -155,7 +158,7 @@ export const refreshToken = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: session.userId },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: ACCESS_TOKEN_TTL }
+      { expiresIn: ACCESS_TOKEN_TTL },
     );
 
     // Return
